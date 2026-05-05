@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:5000
+@accessToken = PEGA_AQUI_EL_ACCESS_TOKEN
+@refreshToken = PEGA_AQUI_EL_REFRESH_TOKEN
+
+### 1. Registrar usuario normal
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "usuario@example.com",
+  "password": "Password123!"
+}
+
+### 2. Registrar usuario admin (cambia el rol manualmente en la DB por ahora)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin123!"
+}
+
+### 3. Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "usuario@example.com",
+  "password": "Password123!"
+}
+
+### 4. Obtener perfil propio (requiere accessToken)
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
+### 5. Endpoint de Admin (debe devolver 403 si el usuario tiene rol User)
+GET {{baseUrl}}/api/users/admin
+Authorization: Bearer {{accessToken}}
+
+### 6. Refrescar el token (cuando el accessToken expire)
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}

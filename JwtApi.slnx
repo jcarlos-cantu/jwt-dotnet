@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JwtApi.Api/JwtApi.Api.csproj" />
+    <Project Path="src/JwtApi.Application/JwtApi.Application.csproj" />
+    <Project Path="src/JwtApi.Domain/JwtApi.Domain.csproj" />
+    <Project Path="src/JwtApi.Infrastructure/JwtApi.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JwtApi.Application.Tests/JwtApi.Application.Tests.csproj" />
+  </Folder>
+</Solution>

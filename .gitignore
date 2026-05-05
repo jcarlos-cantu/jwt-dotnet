@@ -1,0 +1,32 @@
+# Build outputs
+bin/
+obj/
+
+# SQLite database
+*.db
+*.db-shm
+*.db-wal
+
+# .NET secrets & environment
+appsettings.Development.json
+*.user
+.env
+
+# Rider / VS / VS Code
+.idea/
+.vs/
+.vscode/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Test results
+TestResults/
+coverage/
