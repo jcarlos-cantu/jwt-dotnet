@@ -1,11 +1,16 @@
 using JwtApi.Application.DTOs;
 using JwtApi.Application.Interfaces;
+using JwtApi.Application.Configuration;
 using JwtApi.Domain.Entities;
 using JwtApi.Domain.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace JwtApi.Application.UseCases;
 
-public class AuthService(IUserRepository userRepository, ITokenService tokenService) : IAuthService
+public class AuthService(
+    IUserRepository userRepository,
+    ITokenService tokenService,
+    IOptions<JwtOptions> jwtOptions) : IAuthService
 {
     public async Task<TokenResponse> RegisterAsync(RegisterRequest request)
     {
@@ -52,9 +57,8 @@ public class AuthService(IUserRepository userRepository, ITokenService tokenServ
         var refreshToken = tokenService.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpirationDays);
 
-        await userRepository.UpdateAsync(user);
         await userRepository.SaveChangesAsync();
 
         return new TokenResponse(accessToken, refreshToken);

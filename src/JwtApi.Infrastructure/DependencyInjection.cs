@@ -1,4 +1,5 @@
 using JwtApi.Application.Interfaces;
+using JwtApi.Application.Configuration;
 using JwtApi.Application.UseCases;
 using JwtApi.Domain.Repositories;
 using JwtApi.Infrastructure.Auth;
@@ -15,6 +16,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.Section));
+
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 

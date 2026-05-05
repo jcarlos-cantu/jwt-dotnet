@@ -1,10 +1,12 @@
 using FluentAssertions;
 using JwtApi.Application.DTOs;
 using JwtApi.Application.Interfaces;
+using JwtApi.Application.Configuration;
 using JwtApi.Application.UseCases;
 using JwtApi.Domain.Entities;
 using JwtApi.Domain.Enums;
 using JwtApi.Domain.Repositories;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 
@@ -18,7 +20,13 @@ public class AuthServiceTests
 
     public AuthServiceTests()
     {
-        _sut = new AuthService(_userRepository, _tokenService);
+        var jwtOptions = Options.Create(new JwtOptions
+        {
+            ExpirationMinutes = 15,
+            RefreshTokenExpirationDays = 7
+        });
+
+        _sut = new AuthService(_userRepository, _tokenService, jwtOptions);
 
         _tokenService.GenerateAccessToken(Arg.Any<User>()).Returns("access-token");
         _tokenService.GenerateRefreshToken().Returns("refresh-token");
@@ -58,7 +66,7 @@ public class AuthServiceTests
 
         await _sut.RegisterAsync(new RegisterRequest("nuevo@test.com", "Password123!"));
 
-        await _userRepository.Received(1).UpdateAsync(Arg.Is<User>(u =>
+        await _userRepository.Received(1).AddAsync(Arg.Is<User>(u =>
             u.RefreshToken == "refresh-token" &&
             u.RefreshTokenExpiry > DateTime.UtcNow
         ));
@@ -132,9 +140,7 @@ public class AuthServiceTests
 
         await _sut.LoginAsync(new LoginRequest("user@test.com", "Password123!"));
 
-        await _userRepository.Received(1).UpdateAsync(Arg.Is<User>(u =>
-            u.RefreshToken == "refresh-token"
-        ));
+        user.RefreshToken.Should().Be("refresh-token");
         await _userRepository.Received(1).SaveChangesAsync();
     }
 
@@ -184,9 +190,8 @@ public class AuthServiceTests
 
         await _sut.RefreshAsync(new RefreshRequest("token-viejo"));
 
-        await _userRepository.Received(1).UpdateAsync(Arg.Is<User>(u =>
-            u.RefreshToken == "token-nuevo"
-        ));
+        user.RefreshToken.Should().Be("token-nuevo");
+        await _userRepository.Received(1).SaveChangesAsync();
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
